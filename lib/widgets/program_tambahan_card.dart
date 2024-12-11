@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:talentaku_app/models/program_tambahan_event.dart';
+import 'package:talentaku_app/apimodels/program_model.dart';
+
 import 'package:talentaku_app/constants/app_colors.dart';
 import 'package:talentaku_app/constants/app_text_styles.dart';
 import 'package:talentaku_app/constants/app_sizes.dart';
@@ -8,11 +9,11 @@ import 'package:talentaku_app/constants/app_decorations.dart';
 import 'program_detail_sheet.dart';
 
 class ProgramCard extends StatelessWidget {
-  final ProgramEvent programEvent;
+  final Program program; // Ganti ProgramEvent menjadi Program
 
   const ProgramCard({
     Key? key,
-    required this.programEvent,
+    required this.program,
   }) : super(key: key);
 
   @override
@@ -20,7 +21,7 @@ class ProgramCard extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         Get.bottomSheet(
-          ProgramDetailSheet(program: programEvent),
+          ProgramDetailSheet(program: program), // Kirim program ke detail sheet
           isScrollControlled: true,
           backgroundColor: Colors.transparent,
         );
@@ -32,6 +33,7 @@ class ProgramCard extends StatelessWidget {
         decoration: AppDecorations.cardDecoration,
         child: Row(
           children: [
+            // Ganti programEvent.image dengan program.photo
             Container(
               width: 100,
               child: ClipRRect(
@@ -39,11 +41,13 @@ class ProgramCard extends StatelessWidget {
                   topLeft: Radius.circular(AppSizes.radiusXL),
                   bottomLeft: Radius.circular(AppSizes.radiusXL),
                 ),
-                child: Image.asset(
-                  programEvent.image,
-                  fit: BoxFit.cover,
-                  height: double.infinity,
-                ),
+                child: program.photo != null
+                    ? Image.network(
+                        program.photo!, // Jika ada photo, tampilkan dari URL
+                        fit: BoxFit.cover,
+                        height: double.infinity,
+                      )
+                    : Container(color: Colors.grey), // Placeholder jika tidak ada photo
               ),
             ),
             Expanded(
@@ -53,8 +57,9 @@ class ProgramCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    // Tampilkan program.name
                     Text(
-                      programEvent.title,
+                      program.name,
                       style: AppTextStyles.bodyLarge.copyWith(
                         fontWeight: FontWeight.w600,
                       ),

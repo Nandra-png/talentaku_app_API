@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:talentaku_app/apimodels/user_model.dart';
 import 'package:talentaku_app/views/login/login.dart';
 import 'package:talentaku_app/views/splash_screen/splashscreen.dart';
 import 'package:intl/date_symbol_data_local.dart';

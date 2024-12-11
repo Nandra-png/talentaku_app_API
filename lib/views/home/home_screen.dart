@@ -76,25 +76,32 @@ class HomeScreen extends StatelessWidget {
               CategoriesLine(categoryEvent: controller.categories[1]),
 
               // Program Cards
+              // Program Cards
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: AppSizes.paddingXL),
-                child: SizedBox(
-                  height: AppSizes.horizontalListHeight,
-                  width: MediaQuery.of(context).size.width,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: controller.programDetails.length,
-                    itemBuilder: (context, index) {
-                      final program = controller.programDetails[index];
-                      return ProgramCard(
-                        programEvent: ProgramEvent(
-                          title: program['title']!,
-                          image: program['image']!,
-                          description: program['description']!,
+                child: Obx(
+                  () {
+                    if (controller.isLoading.value) {
+                      return Center(child: CircularProgressIndicator());
+                    } else if (controller.informationList.isEmpty) {
+                      return Center(child: Text('No programs available'));
+                    } else {
+                      return SizedBox(
+                        height: AppSizes.horizontalListHeight,
+                        width: MediaQuery.of(context).size.width,
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: controller.informationList.length,
+                          itemBuilder: (context, index) {
+                            final program = controller.informationList[index];
+                            return ProgramCard(
+                              program: program, // Pass Program object directly
+                            );
+                          },
                         ),
                       );
-                    },
-                  ),
+                    }
+                  },
                 ),
               ),
               SizedBox(height: AppSizes.spaceXL),

@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:talentaku_app/models/program_tambahan_event.dart';
+import 'package:talentaku_app/apimodels/program_model.dart';
+
 import 'package:talentaku_app/constants/app_colors.dart';
 import 'package:talentaku_app/constants/app_text_styles.dart';
 import 'package:talentaku_app/constants/app_sizes.dart';
 import 'package:get/get.dart';
 
 class ProgramDetailSheet extends StatelessWidget {
-  final ProgramEvent program;
+  final Program program; // Ganti ProgramEvent menjadi Program
 
   const ProgramDetailSheet({
     Key? key,
@@ -49,7 +50,7 @@ class ProgramDetailSheet extends StatelessWidget {
                 ),
                 const SizedBox(height: AppSizes.spaceXL),
                 Text(
-                  program.title,
+                  program.name, // Tampilkan nama program
                   style: AppTextStyles.heading2.copyWith(
                     color: AppColors.textPrimary,
                   ),
@@ -74,23 +75,33 @@ class ProgramDetailSheet extends StatelessWidget {
                         color: const Color(0xFFF7F2F2),
                         borderRadius: BorderRadius.circular(AppSizes.radiusM),
                         image: DecorationImage(
-                          image: AssetImage(program.image),
+                          image: program.photo != null
+                              ? NetworkImage(program.photo!) // Gambar dari URL jika ada
+                              : AssetImage('assets/placeholder.jpg') as ImageProvider, // Gambar placeholder
                           fit: BoxFit.cover,
                         ),
                       ),
                     ),
                     SizedBox(height: AppSizes.spaceXL),
 
+                    // Tampilkan deskripsi
                     Container(
                       width: double.infinity,
                       padding: EdgeInsets.only(bottom: AppSizes.paddingXL),
-                      child: Text(
-                        program.description,
-                        textAlign: TextAlign.justify,
-                        style: AppTextStyles.bodyMedium.copyWith(
-                          color: const Color(0xFF797979),
-                          height: 1.5,
-                        ),
+                      child: Column(
+                        children: program.desc.map((desc) {
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 10),
+                            child: Text(
+                              desc,
+                              textAlign: TextAlign.justify,
+                              style: AppTextStyles.bodyMedium.copyWith(
+                                color: const Color(0xFF797979),
+                                height: 1.5,
+                              ),
+                            ),
+                          );
+                        }).toList(),
                       ),
                     ),
                   ],

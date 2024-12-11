@@ -23,45 +23,48 @@ class LoginController extends GetxController {
   var isImagePicked = false.obs;
   var profileImage = ''.obs;
 
+  Future<void> login(
+    BuildContext context, String username, String password) async {
+    isLoading.value = true;
+    isLoading.refresh(); // Memastikan UI terupdate
 
-Future<void> login(BuildContext context, String username, String password) async {
-  isLoading.value = true;
-  isLoading.refresh(); // Memastikan UI terupdate
-
-  try {
-    final response = await ApiService.login(username, password);
-    if (response.containsKey('data')) {
-  user.value = UserModel.fromJson(response['data']);
-  if (user.value?.photo != null) {
-    profileImage.value = user.value!.photo!;
-  }
-  Get.snackbar('Success', 'Login Successful');
-  Navigator.pushReplacement(
-    context,
-    MaterialPageRoute(builder: (context) => LoginPickImage()),
-  );
-    } else {
-      Get.snackbar('Error', 'Invalid username or password');
+    try {
+      final response = await ApiService.login(username, password);
+      if (response.containsKey('data')) {
+        user.value = UserModel.fromJson(response['data']);
+        if (user.value?.photo != null) {
+          profileImage.value = user.value!.photo!;
+        }
+        Get.snackbar('Success', 'Login Successful');
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => LoginPickImage()),
+        );
+      } else {
+        Get.snackbar('Error', 'Invalid username or password');
+      }
+    } catch (e) {
+      Get.snackbar('Error', 'Failed to connect to server');
+    } finally {
+      isLoading.value = false;
+      isLoading
+          .refresh(); // Memastikan UI terupdate lagi setelah proses selesai
     }
-  } catch (e) {
-    Get.snackbar('Error', 'Failed to connect to server');
-  } finally {
-    isLoading.value = false;
-    isLoading.refresh(); // Memastikan UI terupdate lagi setelah proses selesai
   }
-}
 
- // Function to pick image and upload it
- Future<void> pickAndUploadImage(BuildContext context) async {
+  // Function to pick image and upload it
+  Future<void> pickAndUploadImage(BuildContext context) async {
     final picker = ImagePicker();
-    final XFile? pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    final XFile? pickedFile =
+        await picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       profileImage.value = pickedFile.path;
       isImagePicked.value = true;
 
       try {
         // Upload image after it is picked
-        final response = await ApiService.uploadProfilePhoto(File(pickedFile.path));
+        final response =
+            await ApiService.uploadProfilePhoto(File(pickedFile.path));
 
         if (response.containsKey('data')) {
           Get.snackbar('Success', 'Photo uploaded successfully');
@@ -79,12 +82,9 @@ Future<void> login(BuildContext context, String username, String password) async
     }
   }
 
-
-
   // Controllers for username and password
   TextEditingController usernameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
-
 
   // Function to create a CustomTextPair model
   CustomTextPairModel getPair() {
@@ -234,13 +234,11 @@ Future<void> login(BuildContext context, String username, String password) async
     );
   }
 
-
-
   void onLoginPressed(BuildContext context) {
     final username = usernameController.text.trim();
     final password = passwordController.text.trim();
     if (username.isNotEmpty && password.isNotEmpty) {
-      login(context,username, password);
+      login(context, username, password);
     } else {
       Get.snackbar('Error', 'Please fill all fields');
     }

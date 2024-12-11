@@ -40,24 +40,23 @@ class LoginScreen extends StatelessWidget {
                       SizedBox(height: AppSizes.spaceXL),
 
                       // Username input field menggunakan CustomTextFieldWidget
-                      CustomTextFieldWidget(
-                          model: controller.getUsernameModel()),
+                      CustomTextFieldWidget(model: controller.getUsernameModel()),
 
                       SizedBox(height: AppSizes.spaceXL),
 
                       // Password input field menggunakan CustomTextFieldWidget
-                      CustomTextFieldWidget(
-                          model: controller.getPasswordModel()),
+                      CustomTextFieldWidget(model: controller.getPasswordModel()),
 
                       SizedBox(height: AppSizes.spaceXL),
 
-                      // Login button
-                      // Login button
+                      
+
+                      // Login button with loading state
                       Obx(() => ReusableButton(
                             buttonText: 'Login',
-                            isLoading: controller.isLoading.value,
                             icon: Icons.arrow_forward_ios_rounded,
                             onPressed: () => controller.onLoginPressed(context),
+                            isLoading: controller.isLoading.value,
                           )),
                     ],
                   ),

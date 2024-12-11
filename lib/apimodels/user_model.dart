@@ -5,7 +5,7 @@ class UserModel {
   final String fullname;
   final String nomorInduk;
   final String address;
-  String? _photo;  // private field
+  String? _photo; // private field
   final String birthInformation;
   final List<String> roles;
   final String grades;
@@ -17,11 +17,11 @@ class UserModel {
     required this.fullname,
     required this.nomorInduk,
     required this.address,
-    String? photo,  // photo parameter can be null
+    String? photo, // photo parameter can be null
     required this.birthInformation,
     required this.roles,
     required this.grades,
-  }) : _photo = photo;  // initialize _photo with the provided value
+  }) : _photo = photo; // initialize _photo with the provided value
 
   String? get photo => _photo; // getter
 
@@ -35,7 +35,7 @@ class UserModel {
       fullname: json['fullname'],
       nomorInduk: json['nomor_induk'],
       address: json['address'],
-      photo: json['photo'],  
+      photo: json['photo'],
       birthInformation: json['birth_information'],
       roles: List<String>.from(json['roles']),
       grades: json['grades'],
