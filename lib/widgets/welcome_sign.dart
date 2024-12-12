@@ -47,10 +47,10 @@ class WelcomeSign extends StatelessWidget {
                   'Selamat Datang,',
                   style: AppTextStyles.bodySmall,
                 ),
-                Text(
-                  controller.userName,
-                  style: AppTextStyles.heading1,
-                ),
+                Obx(() => Text(
+                      controller.userName, // Observasi data username
+                      style: AppTextStyles.heading1,
+                    )),
               ],
             ),
           ),

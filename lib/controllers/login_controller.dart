@@ -5,7 +5,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:talentaku_app/apimodels/user_model.dart';
 import 'package:talentaku_app/apiservice/api_service.dart';
 import 'package:talentaku_app/controllers/home_controller.dart';
-import 'package:talentaku_app/models/profile_models.dart';
+import 'package:talentaku_app/main.dart';
+import 'package:talentaku_app/views/home/home_screen.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_sizes.dart';
 import '../models/login_models.dart';
@@ -23,23 +24,36 @@ class LoginController extends GetxController {
   var isImagePicked = false.obs;
   var profileImage = ''.obs;
 
+
+  @override
+  void onInit() {
+    super.onInit();
+    usernameController.addListener(updateCredentials);
+    passwordController.addListener(updateCredentials);
+  }
+
   Future<void> login(
     BuildContext context, String username, String password) async {
     isLoading.value = true;
-    isLoading.refresh(); // Memastikan UI terupdate
+    isLoading.refresh();
 
     try {
       final response = await ApiService.login(username, password);
       if (response.containsKey('data')) {
-        user.value = UserModel.fromJson(response['data']);
+        // Create user model from data
+        final userData = Map<String, dynamic>.from(response['data']);
+        // Add token and fcm_token to userData
+        userData['token'] = response['token'];
+        userData['fcm_token'] = response['fcm_token'];
+        
+        user.value = UserModel.fromJson(userData);
+        
         if (user.value?.photo != null) {
           profileImage.value = user.value!.photo!;
         }
+        
         Get.snackbar('Success', 'Login Successful');
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => LoginPickImage()),
-        );
+        Get.offAll(() => LoginPickImage());
       } else {
         Get.snackbar('Error', 'Invalid username or password');
       }
@@ -47,8 +61,7 @@ class LoginController extends GetxController {
       Get.snackbar('Error', 'Failed to connect to server');
     } finally {
       isLoading.value = false;
-      isLoading
-          .refresh(); // Memastikan UI terupdate lagi setelah proses selesai
+      isLoading.refresh();
     }
   }
 
@@ -69,7 +82,6 @@ class LoginController extends GetxController {
         if (response.containsKey('data')) {
           Get.snackbar('Success', 'Photo uploaded successfully');
           String uploadedPhotoUrl = response['data']['photo'];
-
           // Update user model with the new photo URL
           user.value?.photo = uploadedPhotoUrl;
           profileImage.value = uploadedPhotoUrl; // Update profile image in UI
@@ -220,13 +232,6 @@ class LoginController extends GetxController {
     );
   }
 
-  @override
-  void onInit() {
-    super.onInit();
-    usernameController.addListener(updateCredentials);
-    passwordController.addListener(updateCredentials);
-  }
-
   void updateCredentials() {
     loginModel.value.updateLoginState(
       usernameController.text,
@@ -251,7 +256,9 @@ class LoginController extends GetxController {
     profileImage.value = '';
   }
 
-  void onLogoutPressed(BuildContext context) {
+  void onLogoutPressed(BuildContext context) async {
+    await ApiService.removeToken(); // Remove the stored token
+    resetForm();
     Get.snackbar(
       'Anda Berhasil Logout',
       'Anda telah keluar dari akun Anda.',
@@ -260,14 +267,16 @@ class LoginController extends GetxController {
       snackPosition: SnackPosition.TOP,
       margin: const EdgeInsets.all(AppSizes.paddingXL),
     );
-    resetForm();
     Get.offAll(() => LoginScreen());
   }
 
   @override
   void onClose() {
-    usernameController.dispose();
-    passwordController.dispose();
+      // Hapus listener sebelum dispose
+  usernameController.removeListener(updateCredentials);
+  passwordController.removeListener(updateCredentials);
+  
+
     super.onClose();
   }
 }

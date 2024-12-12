@@ -32,4 +32,8 @@ class TextPair {
     required this.alignment,
     this.icon, // Add optional icon
   });
+
+  
 }
+
+
