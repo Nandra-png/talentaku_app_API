@@ -39,7 +39,7 @@ dependencies:
   iconly: ^1.0.1
   intl: ^0.18.1
   image_picker: ^0.8.5+3
-#  get_storage: any
+  get_storage: any
 
 dev_dependencies:
   flutter_test:
