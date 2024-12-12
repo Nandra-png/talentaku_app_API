@@ -68,6 +68,13 @@ class HomeController extends GetxController {
 
   // Getter untuk mendapatkan username
 String get userName => user.value?.username ?? 'Guest';
+String get Roles {
+  if (user.value?.roles.isNotEmpty ?? false) {
+    return user.value!.roles.first; 
+  }
+  return 'Guest'; 
+}
+
 
 
   List<Event> events = [

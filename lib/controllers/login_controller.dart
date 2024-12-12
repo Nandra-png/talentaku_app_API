@@ -24,7 +24,6 @@ class LoginController extends GetxController {
   var isImagePicked = false.obs;
   var profileImage = ''.obs;
 
-
   @override
   void onInit() {
     super.onInit();
@@ -33,7 +32,7 @@ class LoginController extends GetxController {
   }
 
   Future<void> login(
-    BuildContext context, String username, String password) async {
+      BuildContext context, String username, String password) async {
     isLoading.value = true;
     isLoading.refresh();
 
@@ -45,13 +44,13 @@ class LoginController extends GetxController {
         // Add token and fcm_token to userData
         userData['token'] = response['token'];
         userData['fcm_token'] = response['fcm_token'];
-        
+
         user.value = UserModel.fromJson(userData);
-        
+
         if (user.value?.photo != null) {
           profileImage.value = user.value!.photo!;
         }
-        
+
         Get.snackbar('Success', 'Login Successful');
         Get.offAll(() => LoginPickImage());
       } else {
@@ -115,7 +114,7 @@ class LoginController extends GetxController {
     final homeController = Get.find<HomeController>();
     return CustomTextPairModel(
       primaryText: homeController.userName,
-      secondaryText: "Siswa KB",
+      secondaryText: homeController.Roles,
       primaryStyle: TextStyle(
           fontWeight: FontWeight.bold, fontSize: 24, color: AppColors.textDark),
       secondaryStyle: TextStyle(fontSize: 16, color: AppColors.primary),
@@ -272,10 +271,9 @@ class LoginController extends GetxController {
 
   @override
   void onClose() {
-      // Hapus listener sebelum dispose
-  usernameController.removeListener(updateCredentials);
-  passwordController.removeListener(updateCredentials);
-  
+    // Hapus listener sebelum dispose
+    usernameController.removeListener(updateCredentials);
+    passwordController.removeListener(updateCredentials);
 
     super.onClose();
   }
