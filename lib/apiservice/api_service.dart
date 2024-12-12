@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
-import 'package:talentaku_app/apimodels/account_model.dart';
+// import 'package:talentaku_app/apimodels/account_model.dart';
 import 'package:talentaku_app/apimodels/program_model.dart';
 
 class ApiService {
@@ -32,19 +32,27 @@ class ApiService {
     final request = http.MultipartRequest('POST', url)
       ..files.add(await http.MultipartFile.fromPath('photo', photo.path));
 
-    final response = await request.send();
-
-    if (response.statusCode == 200) {
-      return jsonDecode(await response.stream.bytesToString());
-    } else {
-      throw Exception('Failed to upload photo');
+    try {
+      final response = await request.send();
+      if (response.statusCode != 200) {
+        final error = jsonDecode(await response.stream.bytesToString());
+        print("Error: ${error['message'] ?? 'Unknown error'}");
+        throw Exception('Upload failed: ${error['message'] ?? 'Unknown error'}');
+      }
+      else {
+        final error = jsonDecode(await response.stream.bytesToString());
+        throw Exception('Upload failed: ${error['message'] ?? 'Unknown error'}');
+      }
+    } catch (e) {
+      throw Exception('Failed to upload photo: $e');
     }
   }
+
 
 // Fetch Information API
   Future<List<Program>> fetchPrograms() async {
     final response =
-        await http.get(Uri.parse('$baseUrl/api/programs'));
+    await http.get(Uri.parse('$baseUrl/api/programs'));
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body)['data'] as List;
@@ -65,8 +73,3 @@ class ApiService {
     }
   }
 }
-
-
-
-
-

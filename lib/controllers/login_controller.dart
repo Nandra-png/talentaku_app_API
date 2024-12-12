@@ -24,7 +24,7 @@ class LoginController extends GetxController {
   var profileImage = ''.obs;
 
   Future<void> login(
-    BuildContext context, String username, String password) async {
+      BuildContext context, String username, String password) async {
     isLoading.value = true;
     isLoading.refresh(); // Memastikan UI terupdate
 
@@ -55,29 +55,27 @@ class LoginController extends GetxController {
   // Function to pick image and upload it
   Future<void> pickAndUploadImage(BuildContext context) async {
     final picker = ImagePicker();
-    final XFile? pickedFile =
-        await picker.pickImage(source: ImageSource.gallery);
+    final XFile? pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
     if (pickedFile != null) {
       profileImage.value = pickedFile.path;
       isImagePicked.value = true;
 
+      isLoading.value = true;
       try {
-        // Upload image after it is picked
-        final response =
-            await ApiService.uploadProfilePhoto(File(pickedFile.path));
-
+        final response = await ApiService.uploadProfilePhoto(File(pickedFile.path));
         if (response.containsKey('data')) {
           Get.snackbar('Success', 'Photo uploaded successfully');
           String uploadedPhotoUrl = response['data']['photo'];
-
-          // Update user model with the new photo URL
           user.value?.photo = uploadedPhotoUrl;
-          profileImage.value = uploadedPhotoUrl; // Update profile image in UI
+          profileImage.value = uploadedPhotoUrl;
         } else {
           Get.snackbar('Error', 'Failed to upload photo');
         }
       } catch (e) {
-        Get.snackbar('Error', 'Failed to upload photo');
+        Get.snackbar('Error', 'Failed to upload photo: $e');
+      } finally {
+        isLoading.value = false;
       }
     }
   }
@@ -133,8 +131,8 @@ class LoginController extends GetxController {
       image: isImagePicked.value
           ? FileImage(File(profileImage.value))
           : AssetImage('images/default_image.png') as ImageProvider,
-      avatarRadius: 60,
-      cameraRadius: 20,
+      avatarRadius: AppSizes.radiusLarge,
+      cameraRadius: AppSizes.radiusXL,
       cameraBackgroundColor: AppColors.backgroundLogin,
       cameraIcon: Icon(Icons.add_a_photo, color: AppColors.textLight),
       onCameraTap: () {
@@ -181,27 +179,75 @@ class LoginController extends GetxController {
     );
   }
 
-  Future<void> pickImageFromCamera(BuildContext context) async {
-    final picker = ImagePicker();
-    final XFile? pickedFile =
-        await picker.pickImage(source: ImageSource.camera);
+  // Future<void> pickImageFromCamera(BuildContext context) async {
+  //   final picker = ImagePicker();
+  //   final XFile? pickedFile =
+  //       await picker.pickImage(source: ImageSource.camera);
+  //
+  //   if (pickedFile != null) {
+  //     profileImage.value = pickedFile.path;
+  //     isImagePicked.value = true;
+  //   }
+  // }
 
+  // Future<void> pickImageFromCamera(BuildContext context) async {
+  //   final picker = ImagePicker();
+  //   final XFile? pickedFile = await picker.pickImage(source: ImageSource.camera);
+  //   if (pickedFile != null) {
+  //     profileImage.value = pickedFile.path;
+  //     isImagePicked.value = true;
+  //     await uploadImage(pickedFile.path);
+  //   }
+  // }
+
+  Future<void> uploadImage(String filePath) async {
+    isLoading.value = true;
+    try {
+      final response = await ApiService.uploadProfilePhoto(File(filePath));
+      if (response.containsKey('data')) {
+        String uploadedPhotoUrl = response['data']['photo'];
+        profileImage.value = uploadedPhotoUrl;
+        user.value?.photo = uploadedPhotoUrl;
+        Get.snackbar('Success', 'Photo uploaded successfully');
+      } else {
+        Get.snackbar('Error', 'Failed to upload photo');
+      }
+    } catch (e) {
+      Get.snackbar('Error', 'Failed to upload photo: $e');
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> pickImage(ImageSource source, BuildContext context) async {
+    final picker = ImagePicker();
+    final XFile? pickedFile = await picker.pickImage(source: source);
     if (pickedFile != null) {
       profileImage.value = pickedFile.path;
       isImagePicked.value = true;
+      await uploadImage(pickedFile.path);
     }
+  }
+
+  Future<void> pickImageFromCamera(BuildContext context) async {
+    await pickImage(ImageSource.camera, context);
   }
 
   Future<void> pickImageFromGallery(BuildContext context) async {
-    final picker = ImagePicker();
-    final XFile? pickedFile =
-        await picker.pickImage(source: ImageSource.gallery);
-
-    if (pickedFile != null) {
-      profileImage.value = pickedFile.path;
-      isImagePicked.value = true;
-    }
+    await pickImage(ImageSource.gallery, context);
   }
+
+  // Future<void> pickImageFromGallery(BuildContext context) async {
+  //   final picker = ImagePicker();
+  //   final XFile? pickedFile =
+  //       await picker.pickImage(source: ImageSource.gallery);
+  //
+  //   if (pickedFile != null) {
+  //     profileImage.value = pickedFile.path;
+  //     isImagePicked.value = true;
+  //     await uploadImage(pickedFile.path);
+  //   }
+  // }
 
   static Widget buildOption({
     required IconData icon,
