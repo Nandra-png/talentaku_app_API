@@ -142,7 +142,8 @@ class DetailLaporanScreen extends StatelessWidget {
                           icon: AppIcons.getLaporanSectionIcon(
                               controller.sections[index].title),
                           isExpanded: controller.sections[index].isExpanded,
-                          onTap: () => controller.toggleSection(index),
+                          status: controller.sections[index].status,
+                          onTap: () => controller.toggleExpansion(index),
                         ),
                       ),
                     )),

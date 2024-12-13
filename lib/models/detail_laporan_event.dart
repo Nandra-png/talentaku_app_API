@@ -14,12 +14,29 @@ class DetailLaporanEvent {
 
 class LaporanSection {
   final String title;
-  final String content;
+  final dynamic content;
   final bool isExpanded;
+  final String status;
 
-  LaporanSection({
+  const LaporanSection({
     required this.title,
     required this.content,
     this.isExpanded = false,
+    this.status = 'Muncul',  
   });
-} 
+
+  // Add copyWith method for easier state updates
+  LaporanSection copyWith({
+    String? title,
+    dynamic content,
+    bool? isExpanded,
+    String? status,
+  }) {
+    return LaporanSection(
+      title: title ?? this.title,
+      content: content ?? this.content,
+      isExpanded: isExpanded ?? this.isExpanded,
+      status: status ?? this.status,
+    );
+  }
+}

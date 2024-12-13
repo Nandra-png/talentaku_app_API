@@ -2,11 +2,12 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+// import 'package:shared_preferences/shared_preferences.dart';
 import 'package:talentaku_app/apimodels/program_model.dart';
 import 'package:talentaku_app/apimodels/user_model.dart';
 
 class ApiService {
-  static const String baseUrl = 'https://82bb-66-96-225-176.ngrok-free.app';
+  static const String baseUrl = 'https://eefa-103-118-96-6.ngrok-free.app';
   static const String _tokenKey = 'auth_token';
 
   // Token management
