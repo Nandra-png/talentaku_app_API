@@ -72,7 +72,7 @@ class LoginController extends GetxController {
     SharedPreferences pref = await SharedPreferences.getInstance();
     final picker = ImagePicker();
     final XFile? pickedFile =
-        await picker.pickImage(source: ImageSource.gallery);
+    await picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       profileImage.value = pickedFile.path;
       isImagePicked.value = true;
@@ -80,7 +80,7 @@ class LoginController extends GetxController {
       try {
         // Upload image after it is picked
         var response =
-            await ApiService.uploadProfilePhoto(file: File(pickedFile.path), token: pref.getString('token_user').toString());
+        await ApiService.uploadProfilePhoto(file: File(pickedFile.path), token: pref.getString('token_user').toString());
 
         if (response.containsKey('data')) {
           Get.snackbar('Success', 'Photo uploaded successfully');
@@ -144,7 +144,11 @@ class LoginController extends GetxController {
   }
 
   ProfileImagePickerModel getProfileImagePickerModel(BuildContext context) {
+    isLoading.value = true;
+    isLoading.refresh();
+
     return ProfileImagePickerModel(
+
       image: isImagePicked.value
           ? FileImage(File(profileImage.value))
           : AssetImage('images/default_image.png') as ImageProvider,
@@ -199,7 +203,7 @@ class LoginController extends GetxController {
   Future<void> pickImageFromCamera(BuildContext context) async {
     final picker = ImagePicker();
     final XFile? pickedFile =
-        await picker.pickImage(source: ImageSource.camera);
+    await picker.pickImage(source: ImageSource.camera);
 
     if (pickedFile != null) {
       await pickAndUploadImage(context);
@@ -211,7 +215,7 @@ class LoginController extends GetxController {
   Future<void> pickImageFromGallery(BuildContext context) async {
     final picker = ImagePicker();
     final XFile? pickedFile =
-        await picker.pickImage(source: ImageSource.gallery);
+    await picker.pickImage(source: ImageSource.gallery);
 
     if (pickedFile != null) {
       await pickAndUploadImage(context);
@@ -244,15 +248,50 @@ class LoginController extends GetxController {
     );
   }
 
-  void onLoginPressed(BuildContext context) {
-    final username = usernameController.text.trim();
-    final password = passwordController.text.trim();
-    if (username.isNotEmpty && password.isNotEmpty) {
-      login(context, username, password);
-    } else {
-      Get.snackbar('Error', 'Please fill all fields');
+  Future<void> onLoginPressed(BuildContext context) async {
+      final username = usernameController.text.trim();
+      final password = passwordController.text.trim();
+
+      if (username.isNotEmpty && password.isNotEmpty) {
+        try {
+          // Dapatkan instance SharedPreferences
+          SharedPreferences pref = await SharedPreferences.getInstance();
+
+          // Panggil API login
+          var response = await ApiService.login(username, password);
+
+          if (response.containsKey('data')) {
+            // Buat model user dari data
+            final userData = Map<String, dynamic>.from(response['data']);
+            userData['token'] = response['token'];
+            userData['fcm_token'] = response['fcm_token'];
+
+            // Simpan token ke shared preferences
+            await pref.setString('token_user', response['token']);
+
+            // Update model user
+            user.value = UserModel.fromJson(userData);
+
+            // Cek apakah user sudah punya foto profil
+            if (user.value?.photo != null && user.value!.photo!.isNotEmpty) {
+              profileImage.value = user.value!.photo!;
+              Get.snackbar('Success', 'Login Successful');
+              Get.offAll(() => MainScreen()); // Langsung ke HomeScreen
+            } else {
+              Get.snackbar('Info', 'Please upload your profile photo');
+              Get.offAll(() => LoginPickImage()); // Ke Pick Image Screen
+            }
+          } else {
+            Get.snackbar('Error', 'Invalid username or password');
+          }
+        } catch (e) {
+          // Tangani error
+          Get.snackbar('Error', 'Something went wrong. Please try again.');
+        }
+      } else {
+        Get.snackbar('Error', 'Please fill all fields');
+      }
     }
-  }
 
   void resetForm() {
     usernameController.clear();

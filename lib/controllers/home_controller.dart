@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:talentaku_app/apimodels/program_model.dart';
+import 'package:talentaku_app/apimodels/student_models.dart';
 import 'package:talentaku_app/apimodels/user_model.dart';
 import 'package:talentaku_app/apiservice/api_service.dart';
 import 'package:talentaku_app/models/broadcast_event.dart';
@@ -13,8 +14,9 @@ class HomeController extends GetxController {
    late LaporanSiswaController laporanController;
   var informationList = <Program>[].obs;
   var isLoading = false.obs;
+   var title = 'Laporan Harian'.obs;
 
-  // Tambahkan variabel untuk menyimpan user
+   // Tambahkan variabel untuk menyimpan user
   var user = Rxn<UserModel>();
 
   @override
@@ -130,10 +132,10 @@ String get Roles {
   ];
 
   // Getter untuk mendapatkan 3 laporan terbaru
-  List<LaporanPreviewEvent> get laporanPreviews {
+  List<Datum> get laporanPreviews {
     laporanController = Get.find<LaporanSiswaController>();
     // Mengambil 3 laporan terbaru dari LaporanSiswaController
-    return laporanController.filteredLaporan.take(3).toList();
+    return laporanController.StudentReport.take(3).toList();
   }
 
 }

@@ -38,7 +38,7 @@ class HomeScreen extends StatelessWidget {
                   itemBuilder: (context, index) {
                     return Padding(
                       padding:
-                          EdgeInsets.symmetric(horizontal: AppSizes.paddingS),
+                      EdgeInsets.symmetric(horizontal: AppSizes.paddingS),
                       child: BroadcastCard(event: controller.events[index]),
                     );
                   },
@@ -80,11 +80,11 @@ class HomeScreen extends StatelessWidget {
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: AppSizes.paddingXL),
                 child: Obx(
-                  () {
+                      () {
                     if (controller.isLoading.value) {
                       return Center(child: CircularProgressIndicator());
-                    } else if (controller.informationList.isEmpty) {
-                      return Center(child: Text('No programs available'));
+                      // } else if (controller.informationList.isEmpty) {
+                      //   return Center(child: Text('No programs available'));
                     } else {
                       return SizedBox(
                         height: AppSizes.horizontalListHeight,

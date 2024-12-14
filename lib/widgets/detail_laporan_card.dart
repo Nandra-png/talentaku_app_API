@@ -3,20 +3,24 @@ import 'package:talentaku_app/constants/app_colors.dart';
 import 'package:talentaku_app/constants/app_text_styles.dart';
 import 'package:talentaku_app/constants/app_sizes.dart';
 
+import '../apimodels/student_models.dart';
+
 class DetailLaporanCard extends StatelessWidget {
-  final String title;
-  final String content;
+  final Datum detailReport;
+  // final String title;
+  // final String content;
   final IconData icon;
   final bool isExpanded;
   final VoidCallback onTap;
 
   const DetailLaporanCard({
     Key? key,
-    required this.title,
-    required this.content,
+    // required this.title,
+    // required this.content,
     required this.icon,
     required this.isExpanded,
     required this.onTap,
+    required this.detailReport,
   }) : super(key: key);
 
   @override
@@ -62,7 +66,7 @@ class DetailLaporanCard extends StatelessWidget {
               SizedBox(width: AppSizes.paddingM),
               Expanded(
                 child: Text(
-                  title,
+                  detailReport.kegiatanAwalBerdoa as String,
                   style: AppTextStyles.bodyLarge.copyWith(
                     fontWeight: FontWeight.w700,
                   ),
@@ -72,7 +76,7 @@ class DetailLaporanCard extends StatelessWidget {
           ),
           children: [
             Text(
-              content,
+              detailReport.kegiatanAwalBerdoa as String,
               style: AppTextStyles.bodyMedium.copyWith(
                 height: 1.5,
               ),

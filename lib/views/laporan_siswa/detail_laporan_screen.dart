@@ -112,13 +112,13 @@ class DetailLaporanScreen extends StatelessWidget {
                                     color: AppColors.primary,
                                   ),
                                   SizedBox(width: AppSizes.paddingXS),
-                                  Text(
-                                    date,
-                                    style: AppTextStyles.bodySmall.copyWith(
-                                      color: AppColors.primary,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
+                                  // Text(
+                                  //   date,
+                                  //   style: AppTextStyles.bodySmall.copyWith(
+                                  //     color: AppColors.primary,
+                                  //     fontWeight: FontWeight.w600,
+                                  //   ),
+                                  // ),
                                 ],
                               ),
                             ),
@@ -137,8 +137,9 @@ class DetailLaporanScreen extends StatelessWidget {
                       children: List.generate(
                         controller.sections.length,
                         (index) => DetailLaporanCard(
-                          title: controller.sections[index].title,
-                          content: controller.sections[index].content,
+                          // title: controller.sections[index].title,
+                          // content: controller.sections[index].content,
+                          detailReport: controller.DetailReport[index],
                           icon: AppIcons.getLaporanSectionIcon(
                               controller.sections[index].title),
                           isExpanded: controller.sections[index].isExpanded,

@@ -1,8 +1,16 @@
 import 'package:get/get.dart';
 import 'package:talentaku_app/models/detail_laporan_event.dart';
 
+import '../apimodels/student_models.dart';
+import '../apiservice/api_service.dart';
+import '../constants/app_colors.dart';
+
 class DetailLaporanController extends GetxController {
+  var isLoading = false.obs;
   final RxList<LaporanSection> sections = <LaporanSection>[].obs;
+  final RxList<Datum> DetailReport = <Datum>[].obs;
+  // var DetailReport = <Datum>[].obs;
+
 
   @override
   void onInit() {
@@ -120,12 +128,92 @@ class DetailLaporanController extends GetxController {
     }
   }
 
-  void toggleSection(int index) {
-    sections[index] = LaporanSection(
-      title: sections[index].title,
-      content: sections[index].content,
-      isExpanded: !sections[index].isExpanded,
-    );
-    sections.refresh();
+  // Fungsi untuk fetch student report
+  void fetchReport() async {
+    try {
+      isLoading(true);
+      final apiService = ApiService();
+      final detail = await apiService.fetchStudentReport();
+      DetailReport.assignAll(detail);
+    } catch (e) {
+      print('Error fetching programs: $e');
+      Get.snackbar(
+        'Error',
+        'Failed to load Detail Report',
+        backgroundColor: AppColors.error,
+        colorText: AppColors.textLight,
+      );
+    } finally {
+      isLoading(false);
+    }
   }
+
+  List<Datum> allLaporan = [
+    Datum(
+      id: 1,
+      created: DateTime.now(),
+      semester: 'Semester 1',
+      kegiatanAwalDihalaman: ['Kegiatan 1'],
+      dihalamanHasil: 'Hasil 1',
+      kegiatanAwalBerdoa: ['Doa Awal'],
+      berdoaHasil: 'Doa Hasil',
+      kegiatanIntiSatu: ['Kegiatan Inti 1'],
+      intiSatuHasil: 'Hasil Inti 1',
+      kegiatanIntiDua: ['Kegiatan Inti 2'],
+      intiDuaHasil: 'Hasil Inti 2',
+      kegiatanIntiTiga: ['Kegiatan Inti 3'],
+      intiTigaHasil: 'Hasil Inti 3',
+      snack: ['Snack 1'],
+      inklusi: ['Inklusi 1'],
+      inklusiHasil: 'Inklusi Hasil',
+      inklusiPenutup: ['Penutup 1'],
+      inklusiPenutupHasil: 'Penutup Hasil',
+      inklusiDoa: ['Inklusi Doa'],
+      inklusiDoaHasil: 'Inklusi Doa Hasil',
+      catatan: ['Catatan 1'],
+      studentId: 9,
+      teacherId: 1,
+      media: [],
+    ),
+  ];
+
+  // void toggleSection(int index) {
+  //   sections[index] = LaporanSection(
+  //     title: sections[index].title,
+  //     content: sections[index].content,
+  //     isExpanded: !sections[index].isExpanded,
+  //   );
+  //   sections.refresh();
+  // }
+
+  void toggleSection(int index) {
+    DetailReport[index] = Datum(
+      id: 0,
+      created: DateTime.now(),
+      semester: 'Semester 1',
+      kegiatanAwalDihalaman: [],
+      dihalamanHasil: '',
+      kegiatanAwalBerdoa: [],
+      berdoaHasil: '',
+      kegiatanIntiSatu: [],
+      intiSatuHasil: '',
+      kegiatanIntiDua: [],
+      intiDuaHasil: '',
+      kegiatanIntiTiga: [],
+      intiTigaHasil: '',
+      snack: [],
+      inklusi: [],
+      inklusiHasil: '',
+      inklusiPenutup: [],
+      inklusiPenutupHasil: '',
+      inklusiDoa: [],
+      inklusiDoaHasil: '',
+      catatan: [],
+      studentId: 0,
+      teacherId: 0,
+      media: [],
+    );
+    DetailReport.refresh();
+  }
+
 }

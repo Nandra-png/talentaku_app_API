@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
+import 'package:talentaku_app/apimodels/student_models.dart';
+import 'package:talentaku_app/controllers/home_controller.dart';
 import 'package:talentaku_app/models/laporan_preview_event.dart';
 import 'package:talentaku_app/constants/app_colors.dart';
 import 'package:talentaku_app/constants/app_text_styles.dart';
@@ -7,7 +10,7 @@ import 'package:talentaku_app/constants/app_sizes.dart';
 import 'package:talentaku_app/constants/app_decorations.dart';
 
 class LaporanPreviewCard extends StatelessWidget {
-  final LaporanPreviewEvent laporan;
+  final Datum laporan;
 
   const LaporanPreviewCard({
     Key? key,
@@ -16,6 +19,8 @@ class LaporanPreviewCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.find<HomeController>();
+
     return GestureDetector(
       onTap: () {
         Get.snackbar(
@@ -57,7 +62,7 @@ class LaporanPreviewCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          laporan.title,
+                          controller.title.value,
                           style: AppTextStyles.bodyLarge,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -72,7 +77,7 @@ class LaporanPreviewCard extends StatelessWidget {
                             ),
                             const SizedBox(width: AppSizes.paddingXS),
                             Text(
-                              laporan.date,
+                              DateFormat('dd MMM yyyy').format(laporan.created),
                               style: AppTextStyles.bodySmall.copyWith(
                                 color: AppColors.textSecondary,
                               ),
@@ -88,8 +93,11 @@ class LaporanPreviewCard extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(AppSizes.paddingL),
               child: Text(
-                laporan.description,
-                style: AppTextStyles.caption,
+                laporan.snack.join(", "),
+                style: AppTextStyles.bodySmall.copyWith(
+                  color: AppColors.textPrimary,
+                  height: AppSizes.textSmall,
+                ),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -100,3 +108,4 @@ class LaporanPreviewCard extends StatelessWidget {
     );
   }
 }
+

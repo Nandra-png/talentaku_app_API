@@ -4,12 +4,13 @@ import 'package:http/http.dart' as http;
 import 'package:mime/mime.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:talentaku_app/apimodels/program_model.dart';
+import 'package:talentaku_app/apimodels/student_models.dart';
 import 'package:talentaku_app/apimodels/user_model.dart';
 import 'package:path/path.dart';
 import 'package:http_parser/http_parser.dart';
 
 class ApiService {
-  static const String baseUrl = 'https://82bb-66-96-225-176.ngrok-free.app';
+  static const String baseUrl = 'https://eefa-103-118-96-6.ngrok-free.app';
   static const String _tokenKey = 'auth_token';
 
   // Token management
@@ -136,6 +137,42 @@ class ApiService {
       return UserModel.fromJson(data);
     } else {
       throw Exception('Failed to fetch user profile');
+    }
+  }
+
+  // Fetch StudentReport API
+  Future<List<Datum>> fetchStudentReport() async {
+    final headers = await _getHeaders();
+    final response = await http.get(
+      Uri.parse('$baseUrl/api/v2/student-reports'),
+      headers: headers,
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body)['data'] as List;
+      return data.map((json) => Datum.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to fetch student reports');
+    }
+  }
+
+  // Fetch DetailReport API
+  Future<List<Datum>> fetchDetailReport(String token) async {
+    // final headers = await _getHeaders();
+    Map<String, String> headers = {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json',
+    };
+    final response = await http.get(
+      Uri.parse('$baseUrl/api/v2/grade/1/student-report/6'),
+      headers: headers,
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body)['data'] as List;
+      return data.map((item) => Datum.fromJson(item)).toList();
+    } else {
+      throw Exception('Failed to fetch student reports');
     }
   }
 }

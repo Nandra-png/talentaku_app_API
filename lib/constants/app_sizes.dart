@@ -6,6 +6,9 @@ class AppSizes {
   static const double paddingL = 15.0;
   static const double paddingXL = 20.0;
 
+  //text
+  static const double textSmall = 2;
+
   // Border Radius
   static const double radiusS = 10.0;
   static const double radiusM = 12.0;
