@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:talentaku_app/constants/app_colors.dart';
 import 'package:talentaku_app/constants/app_sizes.dart';
+import 'package:talentaku_app/constants/app_text_styles.dart';
 import 'package:talentaku_app/controllers/home_controller.dart';
 import 'package:talentaku_app/models/program_tambahan_event.dart';
 import 'package:talentaku_app/widgets/program_tambahan_card.dart';
@@ -54,15 +55,41 @@ class HomeScreen extends StatelessWidget {
                 padding: EdgeInsets.symmetric(horizontal: AppSizes.paddingXL),
                 child: SizedBox(
                   height: AppSizes.laporanCardHeight,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: controller.laporanPreviews.length,
-                    itemBuilder: (context, index) {
-                      return LaporanPreviewCard(
-                        laporan: controller.laporanPreviews[index],
+                  child: Obx(() {
+                    if (controller.laporanPreviews.isEmpty) {
+                      return Container(
+                        width: double.infinity,
+                       
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Image.asset(
+                              'images/logo.png',
+                              width: AppSizes.iconL * 2,
+                              height: AppSizes.iconL * 2,
+                            ),
+                            SizedBox(height: AppSizes.spaceS),
+                            Text(
+                              'Laporan tidak tersedia',
+                              style: AppTextStyles.bodyMedium.copyWith(
+                                color: AppColors.textPrimary.withOpacity(0.5),
+                              ),
+                            ),
+                          ],
+                        ),
                       );
-                    },
-                  ),
+                    }
+                    
+                    return ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: controller.laporanPreviews.length,
+                      itemBuilder: (context, index) {
+                        return LaporanPreviewCard(
+                          laporan: controller.laporanPreviews[index],
+                        );
+                      },
+                    );
+                  }),
                 ),
               ),
 

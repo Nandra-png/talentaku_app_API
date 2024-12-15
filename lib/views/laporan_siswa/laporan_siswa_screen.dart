@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:talentaku_app/constants/app_colors.dart';
 import 'package:talentaku_app/constants/app_text_styles.dart';
 import 'package:talentaku_app/constants/app_sizes.dart';
-import 'package:talentaku_app/controllers/home_controller.dart';
 import 'package:talentaku_app/controllers/laporan_siswa_controller.dart';
 import 'package:talentaku_app/widgets/welcome_sign.dart';
 import 'package:talentaku_app/widgets/laporan_siswa_card.dart';
@@ -13,7 +12,7 @@ class LaporanSiswaScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(LaporanSiswaController());
+    final controller = Get.find<LaporanSiswaController>();
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -22,7 +21,6 @@ class LaporanSiswaScreen extends StatelessWidget {
           children: [
             const WelcomeSign(),
             SizedBox(height: AppSizes.spaceL),
-
             Padding(
               padding: EdgeInsets.symmetric(horizontal: AppSizes.paddingXL),
               child: Theme(
@@ -79,10 +77,13 @@ class LaporanSiswaScreen extends StatelessWidget {
               ),
             ),
             SizedBox(height: AppSizes.spaceM),
-
             Expanded(
               child: Obx(() {
-                if (controller.StudentReport.isEmpty) {
+                if (controller.isLoading.value) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                if (controller.studentReports.isEmpty) {
                   return Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -94,7 +95,7 @@ class LaporanSiswaScreen extends StatelessWidget {
                         ),
                         SizedBox(height: AppSizes.spaceM),
                         Text(
-                          'Tidak ada laporan pada periode ini',
+                          'Tidak ada laporan tersedia',
                           style: AppTextStyles.bodyMedium.copyWith(
                             color: AppColors.textPrimary.withOpacity(0.5),
                           ),
@@ -103,15 +104,21 @@ class LaporanSiswaScreen extends StatelessWidget {
                     ),
                   );
                 }
-                return ListView.builder(
-                  padding: EdgeInsets.symmetric(horizontal: AppSizes.paddingXL),
-                  itemCount: controller.StudentReport.length,
-                  itemBuilder: (context, index) {
-                    return LaporanSiswaCard(
-                      laporan: controller.StudentReport[index],
-                      index: index,
-                    );
+
+                return RefreshIndicator(
+                  onRefresh: () async {
+                    controller.fetchReport();
                   },
+                  child: ListView.builder(
+                    padding: EdgeInsets.symmetric(horizontal: AppSizes.paddingXL),
+                    itemCount: controller.studentReports.length,
+                    itemBuilder: (context, index) {
+                      final report = controller.studentReports[index];
+                      return LaporanSiswaCard(
+                        laporan: report,
+                      );
+                    },
+                  ),
                 );
               }),
             ),

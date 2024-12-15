@@ -5,33 +5,24 @@ import 'package:talentaku_app/apimodels/student_models.dart';
 import 'package:talentaku_app/constants/app_colors.dart';
 import 'package:talentaku_app/constants/app_text_styles.dart';
 import 'package:talentaku_app/constants/app_sizes.dart';
-import 'package:talentaku_app/models/laporan_preview_event.dart';
 import 'package:talentaku_app/views/laporan_siswa/detail_laporan_screen.dart';
-
-import '../controllers/home_controller.dart';
+import 'package:talentaku_app/controllers/home_controller.dart';
 
 class LaporanSiswaCard extends StatelessWidget {
-  final Datum laporan;
-  final int index;
+  final StudentReportData laporan;
 
   const LaporanSiswaCard({
     Key? key,
     required this.laporan,
-    required this.index,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final titleController = Get.put(HomeController());
+    final titleController = Get.find<HomeController>();
 
-    final formattedDate = DateFormat('dd MMM yyyy').format(laporan.created);
     return GestureDetector(
       onTap: () => Get.to(
-            () => const DetailLaporanScreen(),
-        arguments: {
-          'id': 'laporan_${index + 1}',
-          'date': laporan.created.toString(),
-        },
+        () => DetailLaporanScreen(reportId: laporan.id),
       ),
       child: Container(
         margin: EdgeInsets.only(bottom: AppSizes.paddingL),
@@ -67,12 +58,6 @@ class LaporanSiswaCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Text(
-                  //   laporan.created.toIso8601String(),
-                  //   style: AppTextStyles.bodyLarge.copyWith(
-                  //     fontWeight: FontWeight.w600,
-                  //   ),
-                  // ),
                   Text(
                     titleController.title.value,
                     style: AppTextStyles.bodyLarge,
@@ -81,7 +66,7 @@ class LaporanSiswaCard extends StatelessWidget {
                   ),
                   SizedBox(height: AppSizes.paddingXS),
                   Text(
-                    laporan.kegiatanAwalDihalaman.join(", "),
+                    _formatContent(),
                     style: AppTextStyles.bodySmall.copyWith(
                       color: AppColors.textPrimary.withOpacity(0.7),
                       height: 1.5,
@@ -99,7 +84,7 @@ class LaporanSiswaCard extends StatelessWidget {
                       ),
                       SizedBox(width: AppSizes.paddingXS),
                       Text(
-                        formattedDate,
+                        _formatDate(laporan.created),
                         style: AppTextStyles.bodySmall.copyWith(
                           color: AppColors.textSecondary,
                         ),
@@ -113,5 +98,25 @@ class LaporanSiswaCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String _formatDate(String dateStr) {
+    try {
+      final date = DateTime.parse(dateStr);
+      return DateFormat('dd MMM yyyy').format(date);
+    } catch (e) {
+      print('Error formatting date: $dateStr');
+      return dateStr;
+    }
+  }
+
+  String _formatContent() {
+    final List<String> contents = [
+      if (laporan.kegiatanAwalDihalaman.isNotEmpty) laporan.kegiatanAwalDihalaman.join(", "),
+      if (laporan.kegiatanAwalBerdoa.isNotEmpty) laporan.kegiatanAwalBerdoa.join(", "),
+      if (laporan.kegiatanIntiSatu.isNotEmpty) laporan.kegiatanIntiSatu.join(", "),
+    ];
+
+    return contents.isNotEmpty ? contents.join(" • ") : "No content available";
   }
 }

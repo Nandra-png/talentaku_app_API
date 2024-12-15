@@ -10,7 +10,7 @@ import 'package:path/path.dart';
 import 'package:http_parser/http_parser.dart';
 
 class ApiService {
-  static const String baseUrl = 'https://eefa-103-118-96-6.ngrok-free.app';
+  static const String baseUrl = 'https://144d-103-118-96-6.ngrok-free.app';
   static const String _tokenKey = 'auth_token';
 
   // Token management
@@ -141,38 +141,32 @@ class ApiService {
   }
 
   // Fetch StudentReport API
-  Future<List<Datum>> fetchStudentReport() async {
+  Future<StudentReport> fetchStudentReport() async {
     final headers = await _getHeaders();
     final response = await http.get(
-      Uri.parse('$baseUrl/api/v2/student-reports'),
+      Uri.parse('$baseUrl/api/v2/student-report/student'),
       headers: headers,
     );
 
     if (response.statusCode == 200) {
-      final data = json.decode(response.body)['data'] as List;
-      return data.map((json) => Datum.fromJson(json)).toList();
+      return StudentReport.fromJson(json.decode(response.body));
     } else {
       throw Exception('Failed to fetch student reports');
     }
   }
 
   // Fetch DetailReport API
-  Future<List<Datum>> fetchDetailReport(String token) async {
-    // final headers = await _getHeaders();
-    Map<String, String> headers = {
-      'Authorization': 'Bearer $token',
-      'Content-Type': 'application/json',
-    };
+  Future<StudentReportData> fetchDetailReport(int reportId) async {
+    final headers = await _getHeaders();
     final response = await http.get(
-      Uri.parse('$baseUrl/api/v2/grade/1/student-report/6'),
+      Uri.parse('$baseUrl/api/v2/student-report/$reportId'),
       headers: headers,
     );
 
     if (response.statusCode == 200) {
-      final data = json.decode(response.body)['data'] as List;
-      return data.map((item) => Datum.fromJson(item)).toList();
+      return StudentReportData.fromJson(json.decode(response.body)['data']);
     } else {
-      throw Exception('Failed to fetch student reports');
+      throw Exception('Failed to fetch student report details');
     }
   }
 }

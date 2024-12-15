@@ -5,14 +5,14 @@ StudentReport studentReportFromJson(String str) => StudentReport.fromJson(json.d
 String studentReportToJson(StudentReport data) => json.encode(data.toJson());
 
 class StudentReport {
-  List<Datum> data;
+  List<StudentReportData> data;
 
   StudentReport({
     required this.data,
   });
 
   factory StudentReport.fromJson(Map<String, dynamic> json) => StudentReport(
-    data: List<Datum>.from(json["data"].map((x) => Datum.fromJson(x))),
+    data: List<StudentReportData>.from(json["data"].map((x) => StudentReportData.fromJson(x))),
   );
 
   Map<String, dynamic> toJson() => {
@@ -20,9 +20,9 @@ class StudentReport {
   };
 }
 
-class Datum {
+class StudentReportData {
   int id;
-  DateTime created;
+  String created;
   String semester;
   List<String> kegiatanAwalDihalaman;
   String dihalamanHasil;
@@ -46,7 +46,7 @@ class Datum {
   int teacherId;
   List<Media> media;
 
-  Datum({
+  StudentReportData({
     required this.id,
     required this.created,
     required this.semester,
@@ -73,36 +73,36 @@ class Datum {
     required this.media,
   });
 
-  factory Datum.fromJson(Map<String, dynamic> json) => Datum(
-    id: json['id'],
-    created: DateTime.parse(json['created']),
-    semester: json['semester'],
-    kegiatanAwalDihalaman: List<String>.from(json['kegiatan_awal_dihalaman']),
-    dihalamanHasil: json['dihalaman_hasil'],
-    kegiatanAwalBerdoa: List<String>.from(json['kegiatan_awal_berdoa']),
-    berdoaHasil: json['berdoa_hasil'],
-    kegiatanIntiSatu: List<String>.from(json['kegiatan_inti_satu']),
-    intiSatuHasil: json['inti_satu_hasil'],
-    kegiatanIntiDua: List<String>.from(json['kegiatan_inti_dua']),
-    intiDuaHasil: json['inti_dua_hasil'],
-    kegiatanIntiTiga: List<String>.from(json['kegiatan_inti_tiga']),
-    intiTigaHasil: json['inti_tiga_hasil'],
-    snack: List<String>.from(json['snack']),
-    inklusi: List<String>.from(json['inklusi']),
-    inklusiHasil: json['inklusi_hasil'],
-    inklusiPenutup: List<String>.from(json['inklusi_penutup']),
-    inklusiPenutupHasil: json['inklusi_penutup_hasil'],
-    inklusiDoa: List<String>.from(json['inklusi_doa']),
-    inklusiDoaHasil: json['inklusi_doa_hasil'],
-    catatan: List<String>.from(json['catatan']),
-    studentId: json['student_id'],
-    teacherId: json['teacher_id'],
-    media: List<Media>.from(json['media'].map((x) => Media.fromJson(x))),
+  factory StudentReportData.fromJson(Map<String, dynamic> json) => StudentReportData(
+    id: json["id"],
+    created: json["created"],
+    semester: json["semester"],
+    kegiatanAwalDihalaman: List<String>.from(json["kegiatan_awal_dihalaman"].map((x) => x)),
+    dihalamanHasil: json["dihalaman_hasil"],
+    kegiatanAwalBerdoa: List<String>.from(json["kegiatan_awal_berdoa"].map((x) => x)),
+    berdoaHasil: json["berdoa_hasil"],
+    kegiatanIntiSatu: List<String>.from(json["kegiatan_inti_satu"].map((x) => x)),
+    intiSatuHasil: json["inti_satu_hasil"],
+    kegiatanIntiDua: List<String>.from(json["kegiatan_inti_dua"].map((x) => x)),
+    intiDuaHasil: json["inti_dua_hasil"],
+    kegiatanIntiTiga: List<String>.from(json["kegiatan_inti_tiga"].map((x) => x)),
+    intiTigaHasil: json["inti_tiga_hasil"],
+    snack: List<String>.from(json["snack"].map((x) => x)),
+    inklusi: List<String>.from(json["inklusi"].map((x) => x)),
+    inklusiHasil: json["inklusi_hasil"],
+    inklusiPenutup: List<String>.from(json["inklusi_penutup"].map((x) => x)),
+    inklusiPenutupHasil: json["inklusi_penutup_hasil"],
+    inklusiDoa: List<String>.from(json["inklusi_doa"].map((x) => x)),
+    inklusiDoaHasil: json["inklusi_doa_hasil"],
+    catatan: List<String>.from(json["catatan"].map((x) => x)),
+    studentId: json["student_id"],
+    teacherId: json["teacher_id"],
+    media: List<Media>.from(json["media"].map((x) => Media.fromJson(x))),
   );
 
   Map<String, dynamic> toJson() => {
     "id": id,
-    "created": "${created.year.toString().padLeft(4, '0')}-${created.month.toString().padLeft(2, '0')}-${created.day.toString().padLeft(2, '0')}",
+    "created": created,
     "semester": semester,
     "kegiatan_awal_dihalaman": List<dynamic>.from(kegiatanAwalDihalaman.map((x) => x)),
     "dihalaman_hasil": dihalamanHasil,

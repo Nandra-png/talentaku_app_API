@@ -132,10 +132,13 @@ String get Roles {
   ];
 
   // Getter untuk mendapatkan 3 laporan terbaru
-  List<Datum> get laporanPreviews {
+  List<StudentReportData> get laporanPreviews {
+    if (!Get.isRegistered<LaporanSiswaController>()) {
+      Get.put(LaporanSiswaController());
+    }
     laporanController = Get.find<LaporanSiswaController>();
     // Mengambil 3 laporan terbaru dari LaporanSiswaController
-    return laporanController.StudentReport.take(3).toList();
+    return laporanController.studentReports.take(3).toList();
   }
 
 }

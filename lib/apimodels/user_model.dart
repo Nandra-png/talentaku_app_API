@@ -8,7 +8,7 @@ class UserModel {
   String? _photo; // private field
   final String birthInformation;
   final List<String> roles;
-  final String grades;
+  final List<String> grades;
   final String? token;
   final String? fcmToken;
 
@@ -42,7 +42,7 @@ class UserModel {
       photo: json['photo'],
       birthInformation: json['birth_information'],
       roles: List<String>.from(json['roles']),
-      grades: json['grades'],
+      grades: List<String>.from(json['grades']),
       token: json['token'],
       fcmToken: json['fcm_token'],
     );

@@ -54,7 +54,7 @@ class ProfileController extends GetxController {
         secondaryText = userData.address;
         break;
       case 'Kelompok':
-        secondaryText = userData.grades;
+        secondaryText = userData.grades.join(', ');
         break;
       default:
         secondaryText = '';

@@ -3,14 +3,15 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:talentaku_app/apimodels/student_models.dart';
 import 'package:talentaku_app/controllers/home_controller.dart';
-import 'package:talentaku_app/models/laporan_preview_event.dart';
+import 'package:talentaku_app/controllers/navigation_controller.dart';
 import 'package:talentaku_app/constants/app_colors.dart';
 import 'package:talentaku_app/constants/app_text_styles.dart';
 import 'package:talentaku_app/constants/app_sizes.dart';
 import 'package:talentaku_app/constants/app_decorations.dart';
+import 'package:talentaku_app/views/laporan_siswa/detail_laporan_screen.dart';
 
 class LaporanPreviewCard extends StatelessWidget {
-  final Datum laporan;
+  final StudentReportData laporan;
 
   const LaporanPreviewCard({
     Key? key,
@@ -20,17 +21,12 @@ class LaporanPreviewCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<HomeController>();
+    final navigationController = Get.find<NavigationController>();
 
     return GestureDetector(
       onTap: () {
-        Get.snackbar(
-          'Sukses',
-          'Laporan berhasil dibuka',
-          backgroundColor: AppColors.success,
-          colorText: AppColors.textLight,
-          snackPosition: SnackPosition.BOTTOM,
-          margin: const EdgeInsets.all(AppSizes.paddingXL),
-        );
+        // Navigate to detail screen
+        Get.to(() => DetailLaporanScreen(reportId: laporan.id));
       },
       child: Container(
         width: AppSizes.cardWidth,
@@ -77,7 +73,7 @@ class LaporanPreviewCard extends StatelessWidget {
                             ),
                             const SizedBox(width: AppSizes.paddingXS),
                             Text(
-                              DateFormat('dd MMM yyyy').format(laporan.created),
+                              _formatDate(laporan.created),
                               style: AppTextStyles.bodySmall.copyWith(
                                 color: AppColors.textSecondary,
                               ),
@@ -93,7 +89,7 @@ class LaporanPreviewCard extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(AppSizes.paddingL),
               child: Text(
-                laporan.snack.join(", "),
+                _formatContent(),
                 style: AppTextStyles.bodySmall.copyWith(
                   color: AppColors.textPrimary,
                   height: AppSizes.textSmall,
@@ -107,5 +103,24 @@ class LaporanPreviewCard extends StatelessWidget {
       ),
     );
   }
-}
 
+  String _formatDate(String dateStr) {
+    try {
+      final date = DateTime.parse(dateStr);
+      return DateFormat('dd MMM yyyy').format(date);
+    } catch (e) {
+      print('Error formatting date: $dateStr');
+      return dateStr;
+    }
+  }
+
+  String _formatContent() {
+    final List<String> contents = [
+      if (laporan.kegiatanAwalDihalaman.isNotEmpty) laporan.kegiatanAwalDihalaman.join(", "),
+      if (laporan.kegiatanAwalBerdoa.isNotEmpty) laporan.kegiatanAwalBerdoa.join(", "),
+      if (laporan.kegiatanIntiSatu.isNotEmpty) laporan.kegiatanIntiSatu.join(", "),
+    ];
+
+    return contents.isNotEmpty ? contents.join(" • ") : "No content available";
+  }
+}

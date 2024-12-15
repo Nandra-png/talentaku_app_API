@@ -6,6 +6,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:talentaku_app/apimodels/user_model.dart';
 import 'package:talentaku_app/apiservice/api_service.dart';
 import 'package:talentaku_app/controllers/home_controller.dart';
+import 'package:talentaku_app/controllers/laporan_siswa_controller.dart';
+import 'package:talentaku_app/controllers/profile_controller.dart';
 import 'package:talentaku_app/main.dart';
 import 'package:talentaku_app/views/home/home_screen.dart';
 import '../constants/app_colors.dart';
@@ -32,11 +34,9 @@ class LoginController extends GetxController {
     passwordController.addListener(updateCredentials);
   }
 
-  Future<void> login(
-      BuildContext context, String username, String password) async {
+  Future<void> login(BuildContext context, String username, String password) async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     isLoading.value = true;
-    isLoading.refresh();
 
     try {
       final response = await ApiService.login(username, password);
@@ -46,25 +46,84 @@ class LoginController extends GetxController {
         // Add token and fcm_token to userData
         userData['token'] = response['token'];
         userData['fcm_token'] = response['fcm_token'];
-        pref.setString('token_user', response['token']);
 
-        user.value = UserModel.fromJson(userData);
+        final tempUser = UserModel.fromJson(userData);
+        
+        // Check if user has valid role (Murid KB or Murid SD)
+        bool hasValidRole = tempUser.roles.any((role) => 
+          role.toLowerCase() == 'murid kb' || role.toLowerCase() == 'murid sd'
+        );
+
+        if (!hasValidRole) {
+          isLoading.value = false;
+          Get.snackbar(
+            'Error', 
+            'Access denied. Only Murid SD and Murid KB roles are allowed.',
+            backgroundColor: AppColors.error,
+            colorText: AppColors.textLight
+          );
+          return;
+        }
+
+        pref.setString('token_user', response['token']);
+        user.value = tempUser;
+
+        // Initialize controllers
+        _initializeControllers(tempUser);
 
         if (user.value?.photo != null) {
           profileImage.value = user.value!.photo!;
         }
 
-        Get.snackbar('Success', 'Login Successful');
+        isLoading.value = false;
+        Get.snackbar(
+          'Success', 
+          'Login Successful',
+          backgroundColor: AppColors.success,
+          colorText: AppColors.textLight
+        );
         Get.offAll(() => LoginPickImage());
       } else {
-        Get.snackbar('Error', 'Invalid username or password');
+        isLoading.value = false;
+        Get.snackbar(
+          'Error', 
+          'Invalid username or password',
+          backgroundColor: AppColors.error,
+          colorText: AppColors.textLight
+        );
       }
     } catch (e) {
-      Get.snackbar('Error', 'Failed to connect to server');
-    } finally {
       isLoading.value = false;
-      isLoading.refresh();
+      Get.snackbar(
+        'Error', 
+        'Failed to connect to server',
+        backgroundColor: AppColors.error,
+        colorText: AppColors.textLight
+      );
     }
+  }
+
+  void _initializeControllers(UserModel user) {
+    // Initialize HomeController
+    if (!Get.isRegistered<HomeController>()) {
+      Get.put(HomeController());
+    }
+    final homeController = Get.find<HomeController>();
+    homeController.user.value = user;
+    
+    // Initialize ProfileController
+    if (!Get.isRegistered<ProfileController>()) {
+      Get.put(ProfileController());
+    }
+    final profileController = Get.find<ProfileController>();
+    profileController.user.value = user;
+
+    // Initialize LaporanSiswaController
+    if (!Get.isRegistered<LaporanSiswaController>()) {
+      Get.put(LaporanSiswaController());
+    }
+    final laporanController = Get.find<LaporanSiswaController>();
+    laporanController.fetchReport(); // Fetch reports after initialization
   }
 
   // Function to pick image and upload it
@@ -88,6 +147,7 @@ class LoginController extends GetxController {
           // Update user model with the new photo URL
           user.value?.photo = uploadedPhotoUrl;
           profileImage.value = uploadedPhotoUrl; // Update profile image in UI
+          Get.offAll(() => MainScreen()); // Navigate to MainScreen after successful upload
         } else {
           Get.snackbar('Error', 'Failed to upload photo');
         }
@@ -144,11 +204,8 @@ class LoginController extends GetxController {
   }
 
   ProfileImagePickerModel getProfileImagePickerModel(BuildContext context) {
-    isLoading.value = true;
-    isLoading.refresh();
-
+    // Remove state updates from build method
     return ProfileImagePickerModel(
-
       image: isImagePicked.value
           ? FileImage(File(profileImage.value))
           : AssetImage('images/default_image.png') as ImageProvider,
@@ -266,11 +323,43 @@ class LoginController extends GetxController {
             userData['token'] = response['token'];
             userData['fcm_token'] = response['fcm_token'];
 
+            // Create temporary user model to check roles
+            final tempUser = UserModel.fromJson(userData);
+            
+            // Check if user has valid role (Murid KB or Murid SD)
+            bool hasValidRole = tempUser.roles.any((role) => 
+              role.toLowerCase() == 'murid kb' || role.toLowerCase() == 'murid sd'
+            );
+
+            if (!hasValidRole) {
+              Get.snackbar(
+                'Error', 
+                'Access denied. Only Murid SD and Murid KB roles are allowed.',
+                backgroundColor: Colors.red,
+                colorText: Colors.white
+              );
+              return;
+            }
+
             // Simpan token ke shared preferences
             await pref.setString('token_user', response['token']);
 
             // Update model user
-            user.value = UserModel.fromJson(userData);
+            user.value = tempUser;
+
+            // Initialize HomeController with user data
+            if (!Get.isRegistered<HomeController>()) {
+              Get.put(HomeController());
+            }
+            final homeController = Get.find<HomeController>();
+            homeController.user.value = tempUser;
+            
+            // Initialize ProfileController with user data
+            if (!Get.isRegistered<ProfileController>()) {
+              Get.put(ProfileController());
+            }
+            final profileController = Get.find<ProfileController>();
+            profileController.user.value = tempUser;
 
             // Cek apakah user sudah punya foto profil
             if (user.value?.photo != null && user.value!.photo!.isNotEmpty) {
@@ -303,6 +392,30 @@ class LoginController extends GetxController {
   void onLogoutPressed(BuildContext context) async {
     await ApiService.removeToken(); // Remove the stored token
     resetForm();
+
+    // Reset ProfileController data
+    if (Get.isRegistered<ProfileController>()) {
+      final profileController = Get.find<ProfileController>();
+      profileController.user.value = null;
+    }
+
+    // Reset HomeController data
+    if (Get.isRegistered<HomeController>()) {
+      final homeController = Get.find<HomeController>();
+      homeController.user.value = null;
+    }
+
+    // Reset LaporanSiswaController data
+    if (Get.isRegistered<LaporanSiswaController>()) {
+      final laporanController = Get.find<LaporanSiswaController>();
+      laporanController.studentReports.clear(); // Clear the student report list
+    }
+
+    // Delete all controllers
+    Get.delete<ProfileController>(force: true);
+    Get.delete<HomeController>(force: true);
+    Get.delete<LaporanSiswaController>(force: true);
+
     Get.snackbar(
       'Anda Berhasil Logout',
       'Anda telah keluar dari akun Anda.',
