@@ -19,6 +19,7 @@ class LaporanSiswaScreen extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
+            SizedBox(height: AppSizes.spaceXS),
             const WelcomeSign(),
             SizedBox(height: AppSizes.spaceL),
             Padding(

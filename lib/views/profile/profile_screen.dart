@@ -24,7 +24,7 @@ class ProfileScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            const SizedBox(height: AppSizes.spaceXL),
+            SizedBox(height: AppSizes.spaceXS),
             const WelcomeSign(),
             const SizedBox(height: AppSizes.spaceL),
 
