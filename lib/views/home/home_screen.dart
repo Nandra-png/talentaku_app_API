@@ -95,10 +95,7 @@ class HomeScreen extends StatelessWidget {
 
               SizedBox(height: AppSizes.spaceXL),
 
-              // Categories and Cards
-              CategoriesLine(categoryEvent: controller.categories[0]),
-              ClassCard(classEvent: controller.classEvents[0]),
-              SizedBox(height: AppSizes.spaceXL),
+            
 
               CategoriesLine(categoryEvent: controller.categories[1]),
 
