@@ -16,7 +16,7 @@ import '../models/login_models.dart';
 import '../models/profile_image_picker.dart';
 import '../models/text_pair.dart';
 import '../models/text_field.dart';
-import '../views/login/login_pick_image.dart';
+// import '../views/login/login_pick_image.dart';
 import '../views/login/login.dart';
 
 class LoginController extends GetxController {
@@ -82,7 +82,7 @@ class LoginController extends GetxController {
           backgroundColor: AppColors.success,
           colorText: AppColors.textLight
         );
-        Get.offAll(() => LoginPickImage());
+        Get.offAll(() => MainScreen());
       } else {
         isLoading.value = false;
         Get.snackbar(
@@ -368,7 +368,7 @@ class LoginController extends GetxController {
               Get.offAll(() => MainScreen()); // Langsung ke HomeScreen
             } else {
               Get.snackbar('Info', 'Please upload your profile photo');
-              Get.offAll(() => LoginPickImage()); // Ke Pick Image Screen
+              Get.offAll(() => MainScreen()); // Ke Pick Image Screen
             }
           } else {
             Get.snackbar('Error', 'Invalid username or password');
